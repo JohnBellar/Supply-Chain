@@ -45,12 +45,12 @@ const sampleData = {
     delayed: 35,
     total: 320,
   },
-  alertsByType: {
-    'Temperature Alert': 15,
-    'Humidity Alert': 8,
-    'Delay Alert': 12,
-    'Location Alert': 5,
-  },
+  carbonFootprintByRegion: [
+    { region: 'North America', footprint: 245 },
+    { region: 'Europe', footprint: 178 },
+    { region: 'Asia', footprint: 289 },
+    { region: 'South America', footprint: 123 },
+  ],
 };
 
 const CHART_COLORS = ['#2196f3', '#00b0ff', '#00e5ff', '#18ffff'];
@@ -69,13 +69,6 @@ function Analytics() {
       value: stats.deliveryPerformance.delayed,
     },
   ];
-
-  const alertTypeData = Object.entries(stats.alertsByType).map(
-    ([name, value]) => ({
-      name,
-      value,
-    })
-  );
 
   const cardStyle = {
     background: 'linear-gradient(145deg, #1a2027 0%, #121212 100%)',
@@ -207,38 +200,21 @@ function Analytics() {
           </Paper>
         </Grid>
 
-        {/* Alerts by Type */}
+        {/* Carbon Footprint by Region */}
         <Grid item xs={12} md={6}>
           <Paper sx={chartStyle}>
             <Typography variant="h6" gutterBottom sx={{ color: theme.palette.primary.light }}>
-              Alert Distribution
+              Carbon Footprint by Region
             </Typography>
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={alertTypeData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label
-                >
-                  {alertTypeData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={CHART_COLORS[index % CHART_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: theme.palette.background.paper,
-                    border: `1px solid ${theme.palette.divider}`,
-                  }}
-                />
+              <BarChart data={stats.carbonFootprintByRegion}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="region" />
+                <YAxis label={{ value: 'CO₂ Emissions (tons)', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
                 <Legend />
-              </PieChart>
+                <Bar dataKey="footprint" name="CO₂ Emissions (tons)" fill="#4caf50" />
+              </BarChart>
             </ResponsiveContainer>
           </Paper>
         </Grid>

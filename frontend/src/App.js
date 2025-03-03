@@ -1,15 +1,19 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import Box from '@mui/material/Box';
 import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Shipments from './pages/Shipments';
 import ShipmentDetails from './pages/ShipmentDetails';
 import Alerts from './pages/Alerts';
 import Analytics from './pages/Analytics';
+import Products from './pages/Products';
+import ProductDashboard from './pages/ProductDashboard';
 
-const theme = createTheme({
+const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
@@ -30,45 +34,30 @@ const theme = createTheme({
       primary: '#ffffff',
       secondary: 'rgba(255, 255, 255, 0.7)',
     },
-    divider: 'rgba(255, 255, 255, 0.12)',
-  },
-  components: {
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          background: 'linear-gradient(145deg, #1a2027 0%, #121212 100%)',
-          boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          background: 'linear-gradient(145deg, #1a2027 0%, #121212 100%)',
-          boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
-        },
-      },
-    },
   },
 });
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Router>
-        <div style={{ display: 'flex', backgroundColor: theme.palette.background.default, minHeight: '100vh' }}>
+        <Box sx={{ display: 'flex' }}>
           <Navbar />
-          <main style={{ flexGrow: 1, padding: '20px', marginTop: '64px' }}>
+          <Sidebar />
+          <Box component="main" sx={{ flexGrow: 1, p: 0, mt: 8 }}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/shipments" element={<Shipments />} />
               <Route path="/shipments/:id" element={<ShipmentDetails />} />
               <Route path="/alerts" element={<Alerts />} />
               <Route path="/analytics" element={<Analytics />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/products/:id" element={<ProductDashboard />} />
             </Routes>
-          </main>
-        </div>
+          </Box>
+        </Box>
       </Router>
     </ThemeProvider>
   );
