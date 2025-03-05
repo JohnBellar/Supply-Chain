@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Box,
@@ -38,17 +38,8 @@ const generateTimeData = (parameter, min, max) => {
 function ProductDashboard() {
   const { id } = useParams();
   const theme = useTheme();
+  const [sensorData, setSensorData] = useState(null);
   const product = products.find(p => p.id === id);
-
-  if (!product) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h4" color="error">
-          Product not found
-        </Typography>
-      </Box>
-    );
-  }
 
   const cardStyle = {
     background: 'linear-gradient(145deg, #1a2027 0%, #121212 100%)',
@@ -63,6 +54,46 @@ function ProductDashboard() {
     borderRadius: '12px',
     padding: theme.spacing(3),
   };
+
+  useEffect(() => {
+    const fetchSensorData = async () => {
+      try {
+        const response = await fetch(`/api/sensor-data/${id}/latest`);
+        const data = await response.json();
+        setSensorData(data);
+      } catch (error) {
+        console.error('Error fetching sensor data:', error);
+      }
+    };
+
+    fetchSensorData();
+    const interval = setInterval(fetchSensorData, 5000); // Update every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [id]);
+
+  const getDisplayValue = (param, data) => {
+    if (!sensorData) {
+      return `${data.value}${data.unit}`;
+    }
+
+    const sensorValue = sensorData[param.toLowerCase()];
+    if (!sensorValue) {
+      return `${data.value}${data.unit}`;
+    }
+
+    return `${sensorValue.value}${sensorValue.unit}`;
+  };
+
+  if (!product) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h4" color="error">
+          Product not found
+        </Typography>
+      </Box>
+    );
+  }
 
   // Generate time series data for each parameter that has thresholds
   const parameterData = {};
@@ -99,7 +130,9 @@ function ProductDashboard() {
                   {param.charAt(0).toUpperCase() + param.slice(1)}
                 </Typography>
                 <Typography variant="h4" sx={{ color: theme.palette.primary.light }}>
-                  {param === 'location' ? data.desc : `${data.value}${data.unit}`}
+                  {param === 'location' ? 
+                    (sensorData?.location?.desc || data.desc) : 
+                    getDisplayValue(param, data)}
                 </Typography>
                 <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                   {data.range && `Range: ${data.range}`}

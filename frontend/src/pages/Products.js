@@ -35,9 +35,9 @@ function Products() {
                     Monitored Parameters:
                   </Typography>
                   <Box sx={{ mt: 1 }}>
-                    {product.parameters.map((param, index) => (
+                    {Object.entries(product.parameters).map(([param, data]) => (
                       <Typography
-                        key={index}
+                        key={param}
                         variant="body2"
                         sx={{
                           display: 'inline-block',
@@ -50,7 +50,7 @@ function Products() {
                           mb: 1,
                         }}
                       >
-                        {param}
+                        {param === 'location' ? `${param}: ${data.desc}` : `${param}: ${data.value}${data.unit}`}
                       </Typography>
                     ))}
                   </Box>

@@ -1,153 +1,199 @@
-# Smart Supply Chain Tracking System
+# Smart Supply Chain Management System
 
-A complete supply chain tracking system with IoT sensors, blockchain integration, and real-time monitoring.
+A comprehensive supply chain management system that integrates IoT sensors, blockchain, machine learning, and real-time monitoring to ensure product quality and traceability.
 
 ## System Architecture
 
-### Hardware Components
-1. Arduino Uno
-   - DHT22 Temperature/Humidity Sensor
-   - GPS Module
-2. ESP32
-   - WiFi connectivity
-   - Connected to Arduino
-3. GSM Module
-   - Connected to ESP32
-   - Backup data transmission
+### 1. IoT Layer
+- **Arduino Sensor Nodes**: DHT22 temperature/humidity sensors and GPS modules
+- **ESP32 Gateway**: Connects sensor nodes to the network via WiFi and MQTT
+- **Sensors**: Temperature, Humidity, Vibration, Light, GPS location
+- **Communication**: MQTT protocol for real-time data transmission
 
-### Software Components
-1. Frontend (React)
-   - Real-time dashboard
-   - Shipment tracking
-   - Alert monitoring
-2. Backend (Node.js)
-   - MQTT broker for IoT data
-   - MongoDB for data storage
-   - Blockchain integration
-3. Blockchain (Ethereum)
-   - Smart contract for data integrity
-   - Immutable shipment records
+### 2. Blockchain Layer
+- **Smart Contracts**: 
+  - `SupplyChainTracker.sol`: Handles shipment tracking and sensor data
+  - `SupplyChainMonitor.sol`: Manages monitoring and alerts
+- **Features**:
+  - Immutable record of shipment history
+  - Real-time sensor data storage
+  - Automated compliance monitoring
+  - Smart contract-based alerts
 
-## Setup Instructions
+### 3. Backend Layer (Node.js)
+- **API Server**: Express.js REST API
+- **Database**: MongoDB for sensor data and analytics
+- **Services**:
+  - MQTT Service: Handles IoT data ingestion
+  - Blockchain Service: Interacts with smart contracts
+  - ML Service: Predictive analytics and quality monitoring
+  - Database Service: Data persistence and retrieval
 
-### 1. Hardware Setup
-```
-Arduino Uno:
-- Connect DHT22 to pin 2
-- Connect GPS RX to pin 4, TX to pin 3
-- Connect to ESP32 via pins 5 (TX) and 6 (RX)
+### 4. Frontend Layer (React)
+- **Dashboard**: Real-time monitoring and analytics
+- **Features**:
+  - Product monitoring
+  - Shipment tracking
+  - Analytics and reporting
+  - Alert management
 
-ESP32:
-- Connect to Arduino via pins 18 (RX) and 19 (TX)
-- Connect GSM module to pins 16 (RX) and 17 (TX)
-```
+### 5. Machine Learning Layer
+- **Features**:
+  - Carbon footprint prediction
+  - Quality impact analysis
+  - Toxic footprint calculation
+  - Threshold-based quality monitoring
 
-### 2. Install Dependencies
+## Prerequisites
 
-```bash
-# Install MongoDB
-brew install mongodb-community
+1. **Hardware Requirements**:
+   - Arduino boards with sensors
+   - ESP32 development board
+   - DHT22 sensors
+   - GPS modules
 
-# Start MongoDB
-brew services start mongodb-community
+2. **Software Requirements**:
+   - Node.js (v14 or higher)
+   - MongoDB
+   - MQTT Broker (e.g., Mosquitto)
+   - Truffle/Hardhat for blockchain
+   - Arduino IDE
+   - React development environment
 
-# Install MQTT Broker (Mosquitto)
-brew install mosquitto
-brew services start mosquitto
+## Installation Steps
 
-# Install Node.js dependencies
-cd backend
-npm install
+1. **Clone the Repository**:
+   ```bash
+   git clone <repository-url>
+   cd smart-supply-chain
+   ```
 
-cd ../frontend
-npm install
+2. **Set Up Backend**:
+   ```bash
+   cd backend
+   npm install
+   # Create .env file with:
+   # MONGODB_URI=your_mongodb_uri
+   # MQTT_BROKER=mqtt://localhost:1883
+   npm start
+   ```
 
-# Install Blockchain dependencies
-cd ../blockchain
-npm install -g hardhat
-npm install
-```
+3. **Set Up Frontend**:
+   ```bash
+   cd frontend
+   npm install
+   npm start
+   ```
 
-### 3. Configure Environment Variables
-Create .env files in backend and blockchain directories:
+4. **Configure IoT Devices**:
+   - Upload `arduino_sensor_node.ino` to Arduino boards
+   - Update WiFi credentials in `esp32_gateway/config.h`
+   - Upload `esp32_gateway.ino` to ESP32
 
-```env
-# backend/.env
-MONGODB_URI=mongodb://localhost:27017/supply-chain
-MQTT_BROKER=mqtt://localhost:1883
-CONTRACT_ADDRESS=your_contract_address
-PRIVATE_KEY=your_private_key
+5. **Deploy Smart Contracts**:
+   ```bash
+   cd blockchain
+   npm install
+   npx hardhat compile
+   npx hardhat deploy
+   ```
 
-# blockchain/.env
-PRIVATE_KEY=your_private_key
-```
+6. **Start MQTT Broker**:
+   ```bash
+   # Install Mosquitto
+   brew install mosquitto
+   # Start Mosquitto
+   mosquitto -c /usr/local/etc/mosquitto/mosquitto.conf
+   ```
 
-### 4. Deploy Smart Contract
-```bash
-cd blockchain
-npx hardhat node  # Start local blockchain
-npx hardhat run scripts/deploy.js --network localhost
-```
+## Running the System
 
-### 5. Start the Application
-```bash
-# Terminal 1: Start backend
-cd backend
-npm start
+1. **Start Backend Server**:
+   ```bash
+   cd backend
+   npm start
+   ```
 
-# Terminal 2: Start frontend
-cd frontend
-npm start
-```
+2. **Start Frontend Development Server**:
+   ```bash
+   cd frontend
+   npm start
+   ```
 
-## Features
+3. **Access the Dashboard**:
+   - Open browser and navigate to `http://localhost:3000`
+   - Default login credentials:
+     - Username: admin
+     - Password: admin123
 
-1. IoT Integration
-   - Real-time temperature and humidity monitoring
-   - GPS location tracking
-   - Automatic alert generation
-   - Redundant data transmission (WiFi + GSM)
+4. **Monitor IoT Data**:
+   - View real-time sensor data on the dashboard
+   - Check shipment status and location
+   - Monitor environmental parameters
 
-2. Blockchain Integration
-   - Immutable shipment records
-   - Smart contract for data verification
-   - Transparent supply chain tracking
+## Development and Testing
 
-3. Dashboard Features
-   - Real-time sensor data visualization
-   - Shipment tracking and status updates
-   - Alert monitoring and notification
-   - Historical data analysis
+1. **Run Tests**:
+   ```bash
+   # Backend tests
+   cd backend
+   npm test
 
-## Development Notes
+   # Frontend tests
+   cd frontend
+   npm test
 
-### Current Setup (Development)
-- Using mock data to simulate IoT sensors
-- Local blockchain network for testing
-- MongoDB for data persistence
+   # Smart contract tests
+   cd blockchain
+   npx hardhat test
+   ```
 
-### Production Deployment
-1. Update ESP32 code with production WiFi credentials
-2. Deploy smart contract to Ethereum testnet/mainnet
-3. Configure production MongoDB instance
-4. Set up proper security measures:
-   - API authentication
-   - MQTT security
-   - Blockchain wallet management
+2. **Development Mode**:
+   ```bash
+   # Start backend in dev mode
+   cd backend
+   npm run dev
 
+   # Start frontend in dev mode
+   cd frontend
+   npm start
+   ```
+## For hardware simulation, copy and paste the given URL on your browsers and clcik on the run button to view the simulation
+
+Arduino with gps module
+
+https://wokwi.com/projects/424228913022340097
+
+Esp32 with gsm module
+
+https://wokwi.com/projects/424282487318210561
+
+Arduino with dht22
+
+https://wokwi.com/projects/424319734039570433
+
+## The working model of the hardware is uploaded as a video along with the other submissions
 ## Troubleshooting
 
-1. IoT Connection Issues
-   - Check WiFi credentials in ESP32 code
-   - Verify MQTT broker is running
-   - Check serial connections between devices
+1. **MQTT Connection Issues**:
+   - Check if MQTT broker is running
+   - Verify WiFi credentials
+   - Check MQTT topic subscriptions
 
-2. Blockchain Issues
-   - Ensure local blockchain is running
-   - Check contract deployment status
-   - Verify wallet has sufficient funds
+2. **Database Issues**:
+   - Verify MongoDB connection string
+   - Check if MongoDB service is running
+   - Verify database permissions
 
-3. Database Issues
-   - Verify MongoDB service is running
-   - Check connection string in .env
-   - Ensure proper indexes are created
+3. **Blockchain Issues**:
+   - Check network configuration in hardhat.config.js
+   - Verify smart contract deployment
+   - Check gas prices and account balance
+
+## Contributing
+
+Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details

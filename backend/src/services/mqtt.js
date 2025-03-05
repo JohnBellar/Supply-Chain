@@ -1,8 +1,8 @@
 const mqtt = require('mqtt');
-const { saveToDatabase } = require('./database');
+const SensorData = require('../models/SensorData');
 
-const MQTT_BROKER = 'mqtt://localhost:1883';
-const MQTT_TOPIC = 'supply-chain/sensor-data';
+const MQTT_BROKER = process.env.MQTT_BROKER || 'mqtt://localhost:1883';
+const MQTT_TOPICS = ['supply-chain/pharmaceuticals'];
 
 class MQTTService {
     constructor() {
@@ -14,10 +14,12 @@ class MQTTService {
 
         this.client.on('connect', () => {
             console.log('Connected to MQTT broker');
-            this.client.subscribe(MQTT_TOPIC, (err) => {
-                if (!err) {
-                    console.log(`Subscribed to ${MQTT_TOPIC}`);
-                }
+            MQTT_TOPICS.forEach(topic => {
+                this.client.subscribe(topic, (err) => {
+                    if (!err) {
+                        console.log(`Subscribed to ${topic}`);
+                    }
+                });
             });
         });
 
@@ -26,8 +28,39 @@ class MQTTService {
                 const data = JSON.parse(message.toString());
                 console.log('Received sensor data:', data);
 
-                // Save to database
-                await saveToDatabase(data);
+                // Create new sensor data record
+                const sensorData = new SensorData({
+                    productId: 'pharmaceuticals',
+                    temperature: {
+                        value: data.temperature,
+                        unit: '°C',
+                        timestamp: new Date()
+                    },
+                    humidity: {
+                        value: data.humidity,
+                        unit: '%',
+                        timestamp: new Date()
+                    },
+                    vibration: {
+                        value: data.vibration || 0,
+                        unit: 'g',
+                        timestamp: new Date()
+                    },
+                    light: {
+                        value: data.light || 0,
+                        unit: 'lux',
+                        timestamp: new Date()
+                    },
+                    location: {
+                        lat: data.latitude,
+                        lng: data.longitude,
+                        desc: 'Current Location',
+                        timestamp: new Date()
+                    }
+                });
+
+                await sensorData.save();
+                console.log('Sensor data saved to database');
             } catch (error) {
                 console.error('Error processing sensor data:', error);
             }
@@ -41,22 +74,6 @@ class MQTTService {
     disconnect() {
         if (this.client) {
             this.client.end();
-        }
-    }
-
-    // Method to simulate sensor data (for testing)
-    simulateSensorData(shipmentId) {
-        const data = {
-            shipmentId,
-            temperature: (20 + Math.random() * 15).toFixed(2),
-            humidity: (50 + Math.random() * 30).toFixed(2),
-            latitude: (Math.random() * 180 - 90).toFixed(6),
-            longitude: (Math.random() * 360 - 180).toFixed(6),
-            timestamp: new Date().toISOString()
-        };
-
-        if (this.client) {
-            this.client.publish(MQTT_TOPIC, JSON.stringify(data));
         }
     }
 }
